@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<title>Şampiyonlar Ligi Kura Simülasyonu</title>
+<style>
+  body { font-family: Arial, sans-serif; margin: 20px; }
+  h2 { color: #2E86C1; }
+  button { padding: 10px 20px; font-size: 16px; margin-bottom: 20px; }
+  table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+  th, td { border: 1px solid #555; padding: 8px; text-align: left; }
+  th { background-color: #2E86C1; color: white; }
+</style>
+</head>
+<body>
+
+<h2>Şampiyonlar Ligi Kura Simülasyonu 🎲</h2>
+<button id="drawBtn">Kura Çek</button>
+<div id="result"></div>
+
+<script>
+// Takımlar ve ülkeleri
+const pots = {
+  A: [
+    {name:"Paris Saint-Germain", country:"FRA"},
+    {name:"Real Madrid", country:"ESP"},
+    {name:"Manchester City", country:"ENG"},
+    {name:"Bayern München", country:"GER"},
+    {name:"Liverpool", country:"ENG"},
+    {name:"Inter Milan", country:"ITA"},
+    {name:"Chelsea", country:"ENG"},
+    {name:"Borussia Dortmund", country:"GER"},
+    {name:"Barcelona", country:"ESP"}
+  ],
+  B: [
+    {name:"Arsenal", country:"ENG"},
+    {name:"Bayer Leverkusen", country:"GER"},
+    {name:"Atlético Madrid", country:"ESP"},
+    {name:"Benfica", country:"POR"},
+    {name:"Atalanta", country:"ITA"},
+    {name:"Villarreal", country:"ESP"},
+    {name:"Juventus", country:"ITA"},
+    {name:"Eintracht Frankfurt", country:"GER"},
+    {name:"Club Brugge", country:"BEL"}
+  ],
+  C: [
+    {name:"Tottenham Hotspur", country:"ENG"},
+    {name:"PSV Eindhoven", country:"NED"},
+    {name:"Ajax", country:"NED"},
+    {name:"Napoli", country:"ITA"},
+    {name:"Sporting CP", country:"POR"},
+    {name:"Olympiacos", country:"GRE"},
+    {name:"Slavia Prague", country:"CZE"},
+    {name:"Bodø/Glimt", country:"NOR"},
+    {name:"Marseille", country:"FRA"}
+  ],
+  D: [
+    {name:"Copenhagen", country:"DEN"},
+    {name:"Monaco", country:"FRA"},
+    {name:"Galatasaray", country:"TUR"},
+    {name:"Union SG", country:"BEL"},
+    {name:"Qarabağ", country:"AZE"},
+    {name:"Athletic Club", country:"ESP"},
+    {name:"Newcastle United", country:"ENG"},
+    {name:"Pafos", country:"CYP"},
+    {name:"Kairat", country:"KAZ"}
+  ]
+};
+
+// Shuffle fonksiyonu
+function shuffle(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+}
+
+// Kura çekme fonksiyonu (Ev / Deplasman ayrımı ile)
+function drawFull() {
+  const allTeams = [...pots.A, ...pots.B, ...pots.C, ...pots.D];
+  const resultDiv = document.getElementById("result");
+  resultDiv.innerHTML = "";
+
+  const table = document.createElement("table");
+  const header = table.insertRow();
+  header.innerHTML = "<th>Takım</th><th>Ev</th><th>Deplasman</th>";
+
+  allTeams.forEach(team => {
+    let evOpponents = [];
+    let deplOpponents = [];
+
+    ["A","B","C","D"].forEach(pot => {
+      let candidates = pots[pot].filter(t => t.name !== team.name && t.country !== team.country && !evOpponents.includes(t.name) && !deplOpponents.includes(t.name));
+      shuffle(candidates);
+      let take = Math.min(2, candidates.length);
+      for(let i=0;i<take;i++){
+        if(i % 2 === 0) evOpponents.push(candidates[i].name);
+        else deplOpponents.push(candidates[i].name);
+      }
+    });
+
+    const row = table.insertRow();
+    row.innerHTML = <td><b>${team.name} (${team.country})</b></td><td>${evOpponents.join(", ")}</td><td>${deplOpponents.join(", ")}</td>;
+  });
+
+  resultDiv.appendChild(table);
+}
+
+// Butona tıklayınca çalışacak şekilde bağla
+document.getElementById("drawBtn").onclick = drawFull;
+</script>
+
+</body>
+</html>
